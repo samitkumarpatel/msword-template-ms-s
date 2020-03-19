@@ -1,0 +1,5 @@
+node {
+    stage('init'){
+        sh 'echo "Yet to complate"'
+    }
+}

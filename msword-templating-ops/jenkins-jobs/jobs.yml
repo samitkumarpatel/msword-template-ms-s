@@ -1,0 +1,78 @@
+---
+- view:
+    name: msword
+    view-type: list
+    description: 'msword templating'
+    columns:
+        - status
+        - weather
+        - job
+        - last-success
+        - last-failure
+        - last-duration
+        - extra-build-parameter: MY_PARAMETER
+    regex: .*msword-.*
+- job:
+    name: msword-templating-ui_build
+    display-name: 'msword-templating-ui_build'
+    description: 'msword-templating-ui build'
+    project-type: pipeline
+    pipeline-scm:
+      scm:
+      - git:
+          branches:
+          - master
+          url: https://github.com/samitkumarpatel/msword-templating-ui.git
+          credentials-id: 'github'
+          skip-tag: true
+          wipe-workspace: false
+      script-path: Jenkinsfile
+      lightweight-checkout: true
+- job:
+    name: msword-templating-fileexplorer-api_build
+    display-name: 'msword-templating-fileexplorer-api'
+    description: 'msword-templating-fileexplorer-api'
+    project-type: pipeline
+    pipeline-scm:
+      scm:
+      - git:
+          branches:
+          - master
+          url: https://github.com/samitkumarpatel/msword-templating-fileexplorer-api.git
+          credentials-id: 'github'
+          skip-tag: true
+          wipe-workspace: false
+      script-path: Jenkinsfile
+      lightweight-checkout: true
+- job:
+    name: msword-templating-api_build
+    display-name: 'msword-templating-api'
+    description: 'msword-templating-api'
+    project-type: pipeline
+    pipeline-scm:
+      scm:
+      - git:
+          branches:
+          - master
+          url: https://github.com/samitkumarpatel/msword-templating-api.git
+          credentials-id: 'github'
+          skip-tag: true
+          wipe-workspace: false
+      script-path: Jenkinsfile
+      lightweight-checkout: true
+- job:
+    name: msword-templating_deployment
+    display-name: 'msword-templating'
+    description: 'msword-templating'
+    project-type: pipeline
+    pipeline-scm:
+      scm:
+      - git:
+          branches:
+          - master
+          url: https://github.com/samitkumarpatel/msword-templating-ci-cd.git
+          credentials-id: 'github'
+          skip-tag: true
+          wipe-workspace: false
+      script-path: Jenkinsfile
+      lightweight-checkout: true

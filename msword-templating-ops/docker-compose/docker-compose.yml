@@ -1,0 +1,47 @@
+---
+version: '3.7'
+services:
+  msword-templating-fileexplorer-api:
+    image: samitkumarpatel/msword-templating-fileexplorer-api:latest
+    volumes:
+    - type: volume
+      source: template
+      target: /template
+    - type: volume
+      source: download
+      target: /download
+    networks:
+    - msword-templating
+  msword-templating-api:
+    image: samitkumarpatel/msword-templating-api:latest
+    volumes:
+    - type: volume
+      source: template
+      target: /template
+    - type: volume
+      source: download
+      target: /download
+    environment:
+    - TEMPLATE_PATH_=/template/
+    - DOWNLOAD_PATH_=/download/
+    networks:
+    - msword-templating
+  msword-templating-ui:
+    image: samitkumarpatel/msword-templating-ui:latest
+    networks:
+      - msword-templating
+  nginx:
+    image: nginx:latest
+    volumes: 
+    - type: bind
+      source: ./nginx.conf
+      target: /etc/nginx/nginx.conf
+    ports:
+    - 8080:80
+    networks:
+    - msword-templating
+networks:
+  msword-templating:
+volumes:
+  template:
+  download:

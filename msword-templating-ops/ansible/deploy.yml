@@ -1,0 +1,37 @@
+---
+  - hosts: do
+    gather_facts: false
+    tasks:
+      - block:
+        - name: "Provision folder for application"
+          with_items:
+          - template
+          - download
+          - application
+          file:
+            path: "/{{item}}"
+            state: directory
+        - name: "Checkout the application"
+          git:
+            repo: "https://github.com/samitkumarpatel/msword-templating-ci-cd.git"
+            dest: "/application"
+            version: master
+        - name: "start docker-compose"
+          shell: "docker-compose -f /application/docker-compose/docker-compose.yml up -d"
+          register: output
+        - debug:
+            msg: "{{output.stdout}}"
+        tags: 
+        - start
+      
+      - block:
+        - name: "stop the application"
+          shell: "docker-compose -f /application/docker-compose/docker-compose.yml down -v"
+          register: stop_output
+        - name: "stop - debugging"
+          debug:
+            msg: "{{stop_output.stdout}}"
+        tags: 
+        - stop
+        - never
+          

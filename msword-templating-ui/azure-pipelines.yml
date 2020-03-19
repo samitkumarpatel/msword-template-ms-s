@@ -1,0 +1,49 @@
+name: $(Date:dd-MM-yyyy)$(Rev:.r)
+trigger:
+- master
+- release/*
+
+pr:
+- master
+- release/*
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  imageName: 'samitkumarpatel/msword-templating-ui'
+  containerRegistryServiceConnection: 'hub.docker.com'
+  tags: |
+      latest
+      $(Build.BuildNumber)
+      
+jobs:  
+- job: Build
+  steps:
+  
+  - bash: ls -alGh
+    displayName: Workspace ls
+  
+  - bash: npm install
+    displayName: npm install
+
+  - bash: npm run build
+    displayName: npm build
+  
+  - task: Docker@2
+    displayName: "Docker Build"
+    inputs:
+      command: build
+      Dockerfile: '**/Dockerfile'
+      containerRegistry: $(containerRegistryServiceConnection)
+      repository: $(imageName)
+      tags: $(tags)
+  
+  - task: Docker@2
+    displayName: "Docker Push"
+    inputs: 
+      command: push
+      containerRegistry: $(containerRegistryServiceConnection)
+      repository: $(imageName)
+      tags: $(tags)
+    condition: eq(variables['Build.SourceBranch'], 'refs/heads/master')

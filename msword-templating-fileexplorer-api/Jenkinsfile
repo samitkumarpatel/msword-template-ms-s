@@ -1,0 +1,34 @@
+node {
+    def tagName = "samitkumarpatel/msword-templating-fileexplorer-api"
+    def app
+    def triggers = []
+    if (env.BRANCH_NAME == "master") {
+        triggers << cron('* * * * *')
+    }
+    properties (
+      [
+          pipelineTriggers(triggers)
+      ]
+    )
+    stage('checkout') {
+        checkout scm
+    }
+    stage('mvn build') {
+        sh './mvnw clean install'
+    }
+    stage('build') {
+        app = docker.build("${tagName}")        
+    }
+    stage('test') {
+        app.inside("--entrypoint=''") {
+            sh 'echo "Tests passed"'
+        }
+    }
+    stage('push') {
+        docker.withRegistry('https://registry.hub.docker.com', 'dockerhub') {
+            def timestamp = new Date().format('yyyy-MM-dd')
+            app.push("${timestamp}-0.0.${env.BUILD_ID}")
+            app.push('latest')
+        }
+    }
+}
